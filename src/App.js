@@ -151,7 +151,7 @@ setFunctionArray(funcArr)
     
     <div>{bridgeInitText}</div>
     <h1>Dero Universal Contract UI</h1>
-            <p>This is an interface for your OAO. What are you here to do?</p>
+            
             <form onSubmit={getContract}>
                 <input id="scid" placeholder='Enter contract SCID here...' type="text"/>        
                 <button type={"submit"}>Select</button>
