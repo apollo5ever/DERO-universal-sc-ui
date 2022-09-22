@@ -81,7 +81,7 @@ var fA = []
     console.log(functionArray)
     const deroBridgeApi = deroBridgeApiRef.current
     const [err, res] = await to(deroBridgeApi.wallet('start-transfer', {
-    	"scid": scid,
+    	"scid": SCID,
     	"ringsize": 2,
       "transfers":transfers,
     	"sc_rpc": 
