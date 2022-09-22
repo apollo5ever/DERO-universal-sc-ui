@@ -10,6 +10,7 @@ const App = () => {
 
 
   const [scid,setSCID] = React.useState("")
+  var SCID=""
   const [code,setCode]= React.useState("")
   const [functionArray,setFunctionArray] = React.useState([])  
 var fA = []
@@ -113,6 +114,7 @@ var fA = []
             variables:true
     }))
       setSCID(event.target.scid.value)
+      SCID = event.target.scid.value
 
       let functionSearch = /Function(.{1,}\n){1,}End Function/gm
       let argSearch = /\(.*\)/
