@@ -5,6 +5,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import to from 'await-to-js'
 import './app.css'
+import Accordion from './components/accordion.js'
 
 const App = () => {
 
@@ -16,6 +17,7 @@ const App = () => {
 var fA = []
   const deroBridgeApiRef = React.useRef()
   const [bridgeInitText, setBridgeInitText] = React.useState('Not connected to extension')
+  const [vars,setVars]=React.useState(null)
 
   React.useEffect(() => {
     const load = async () => {
@@ -49,10 +51,17 @@ var fA = []
     console.log(F)
     console.log(scid)
     console.log(fA)
-    let transfers= [{
+    let transfers=[]
+    if(event.target.asset.value){
+      transfers.push({
+        "scid":event.target.asset.value,
+        "burn":parseInt(event.target.assetAmount.value)
+      })
+    }if(event.target.destination.value){
+      transfers.push({
       "destination":event.target.destination.value,
       "burn":parseInt(event.target.burn.value)
-    }]
+    })}
     let args = [{
       "name": "entrypoint",
       "datatype": "S",
@@ -83,6 +92,7 @@ var fA = []
     const [err, res] = await to(deroBridgeApi.wallet('start-transfer', {
     	"scid": SCID,
     	"ringsize": 2,
+      "fees":parseInt(event.target.fee.value),
       "transfers":transfers,
     	"sc_rpc": 
         args
@@ -133,6 +143,11 @@ for (var f=0;f<funcArr.length;f++){
 console.log(funcArr)
 fA = funcArr
 setFunctionArray(funcArr)
+
+let variables = Object.keys(res.data.result.stringkeys)
+.map(x=>new Object({"name":x,"value":res.data.result.stringkeys[x]}))
+setVars(variables)
+console.log("vars",variables)
   }, []) 
 
 
@@ -158,7 +173,13 @@ setFunctionArray(funcArr)
                 <input id="scid" placeholder='Enter contract SCID here...' type="text"/>        
                 <button type={"submit"}>Select</button>
             </form>
-            {functionArray.map((x,j)=><div className="function"><pre>{x.code}</pre><form id={j} onSubmit={execute}><input placeholder="destination" id="destination" type="text"/><input placeholder="burn" id="burn" type="text"/> {x.ints?x.ints.map((z,i)=><input placeholder={z} id={`int${i}`} type="text"/>):""}{x.strs?x.strs.map((z,i)=><input placeholder={z} id={`str${i}`} type="text"/>):""}<button type="submit">Execute</button></form></div>)}
+            {vars&&vars.map(x=><p>{x.name+": "+x.value}</p>)}
+            
+            {/* {
+            functionArray.map((x,j)=><div className="function"><pre>{x.code}</pre><form id={j} onSubmit={execute}><input placeholder="destination" id="destination" type="text"/><input placeholder="dero amount" id="burn" type="text"/><input placeholder="scid of asset to send if any" id="asset" type="text"/><input placeholder="asset amount if any" id="assetAmount" type="text"/> <input placeholder="fee" id="fee" type="text"/>{x.ints?x.ints.map((z,i)=><input placeholder={z} id={`int${i}`} type="text"/>):""}{x.strs?x.strs.map((z,i)=><input placeholder={z} id={`str${i}`} type="text"/>):""}<button type="submit">Execute</button></form></div>)
+            
+            } */}
+            {functionArray.map(x=><Accordion code={x.code} ints={x.ints} strs={x.strs} name={x.name} deroBridgeApiRef={deroBridgeApiRef} scid={scid}/>)}
 
     
 
