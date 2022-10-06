@@ -18,6 +18,9 @@ var fA = []
   const deroBridgeApiRef = React.useRef()
   const [bridgeInitText, setBridgeInitText] = React.useState('Not connected to extension')
   const [vars,setVars]=React.useState(null)
+  const [displayVars,setDisplayVars] = React.useState(false)
+  const [balanceList,setBalanceList] = React.useState(null)
+  const [displayBalance,setDisplayBalance] = React.useState(false)
 
   React.useEffect(() => {
     const load = async () => {
@@ -128,8 +131,8 @@ var fA = []
 
       let functionSearch = /Function(.{1,}\n){1,}End Function/gm
       let argSearch = /\(.*\)/
-      let intSearch = /\w{1,}\s{1}Uint64/g
-      let strSearch = /\w{1,}\s{1}String/g
+      let intSearch = /\w{1,}\s{1}Uint64/gi
+      let strSearch = /\w{1,}\s{1}String/gi
       let nameSearch = /\w+/g
     
 let code = res.data.result.code
@@ -147,6 +150,11 @@ setFunctionArray(funcArr)
 let variables = Object.keys(res.data.result.stringkeys)
 .map(x=>new Object({"name":x,"value":res.data.result.stringkeys[x]}))
 setVars(variables)
+
+let bl= Object.keys(res.data.result.balances)
+.map(x=><p>Balance of {x=="0000000000000000000000000000000000000000000000000000000000000000"?"Dero":x}: {res.data.result.balances[x]} (atomic units)</p>)
+setBalanceList(bl)
+
 console.log("vars",variables)
   }, []) 
 
@@ -173,7 +181,8 @@ console.log("vars",variables)
                 <input id="scid" placeholder='Enter contract SCID here...' type="text"/>        
                 <button type={"submit"}>Select</button>
             </form>
-            {vars&&vars.map(x=><p>{x.name+": "+x.value}</p>)}
+            {displayBalance?<div className="function"><div className="title">Balances <div className="toggle" onClick={()=>setDisplayBalance(!displayBalance)}>-</div></div>{balanceList}</div>:<div className="function"><div className="title">Balances <div className="toggle" onClick={()=>setDisplayBalance(!displayBalance)}>+</div></div></div>}
+            {vars&&displayVars?<div className="function"><div className="title">Variables <div className="toggle" onClick={()=>setDisplayVars(!displayVars)}>-</div></div>{vars.map(x=><p>{x.name+": "+x.value}</p>)}</div>:<div className="function"><div className="title">Variables <div className="toggle" onClick={()=>setDisplayVars(!displayVars)}>+</div></div></div>}
             
             {/* {
             functionArray.map((x,j)=><div className="function"><pre>{x.code}</pre><form id={j} onSubmit={execute}><input placeholder="destination" id="destination" type="text"/><input placeholder="dero amount" id="burn" type="text"/><input placeholder="scid of asset to send if any" id="asset" type="text"/><input placeholder="asset amount if any" id="assetAmount" type="text"/> <input placeholder="fee" id="fee" type="text"/>{x.ints?x.ints.map((z,i)=><input placeholder={z} id={`int${i}`} type="text"/>):""}{x.strs?x.strs.map((z,i)=><input placeholder={z} id={`str${i}`} type="text"/>):""}<button type="submit">Execute</button></form></div>)
