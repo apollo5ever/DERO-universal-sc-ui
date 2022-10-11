@@ -126,10 +126,11 @@ var fA = []
             code:true,
             variables:true
     }))
+    console.log(res)
       setSCID(event.target.scid.value)
       SCID = event.target.scid.value
 
-      let functionSearch = /Function(.{1,}\n){1,}End Function/gm
+      let functionSearch = /Function(.{1,}\r*\n){1,}End Function/gm
       let argSearch = /\(.*\)/
       let intSearch = /\w{1,}\s{1}Uint64/gi
       let strSearch = /\w{1,}\s{1}String/gi
